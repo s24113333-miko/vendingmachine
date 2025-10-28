@@ -1,0 +1,678 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>🦖 DINO VENDING — ULTIMATE PRO MAX</title>
+<style>
+  :root{
+    --bg1:#071018;
+    --bg2:#0b2a2f;
+    --neon:#00ff99;
+    --accent:#7cffb2;
+    --glass: rgba(255,255,255,0.06);
+    --panel:#05131a;
+    --txt:#dffcf0;
+    --muted:#9edfc9;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;}
+  body{
+    background: radial-gradient(1200px 600px at 10% 10%, rgba(0,255,153,0.05), transparent 5%),
+                linear-gradient(180deg,var(--bg1),var(--bg2));
+    color:var(--txt);
+    display:flex;align-items:center;justify-content:center;padding:32px;
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  }
+
+  /* Stage */
+  .stage{
+    width:100%;
+    max-width:1100px;
+    height:760px;
+    display:grid;
+    grid-template-columns: 420px 1fr;
+    gap:28px;
+    align-items:center;
+    position:relative;
+  }
+
+  /* Left — cabinet */
+  .cabinet{
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:18px;
+    padding:18px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 40px rgba(0,255,153,0.03) inset;
+    position:relative;
+    overflow:hidden;
+  }
+
+  .cabinet .header{
+    display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;
+  }
+  .brand{
+    display:flex;gap:12px;align-items:center;
+  }
+  .logo{
+    width:64px;height:64px;border-radius:10px;
+    background:linear-gradient(135deg,var(--neon),#7fffb1);
+    display:flex;align-items:center;justify-content:center;font-size:30px;
+    box-shadow: 0 6px 20px rgba(0,255,153,0.12), inset 0 -6px 16px rgba(255,255,255,0.05);
+  }
+  .title{font-weight:700;color:var(--txt);letter-spacing:0.6px}
+  .subtitle{font-size:12px;color:var(--muted);margin-top:2px}
+
+  /* cabinet screen */
+  .screen{
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.12));
+    border-radius:12px;padding:14px;border:1px solid rgba(255,255,255,0.03);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    display:flex;flex-direction:column;gap:12px;height:540px;
+  }
+
+  .top-row{display:flex;gap:12px;align-items:center;justify-content:space-between}
+  .led-panel{
+    background:linear-gradient(180deg,#001d18,#00322b);
+    padding:10px;border-radius:10px;min-width:200px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.5), inset 0 0 30px rgba(0,255,153,0.06);
+    text-align:center;
+    border:1px solid rgba(0,255,153,0.08);
+  }
+  .led-panel .label{font-size:11px;color:var(--muted);letter-spacing:1px}
+  .led-panel .value{font-family: 'Orbitron', monospace; font-size:22px;color:var(--neon); margin-top:6px;}
+
+  .controls{
+    flex:1;display:flex;flex-direction:column;gap:10px;
+  }
+
+  .items{
+    display:grid;grid-template-columns:1fr 1fr;gap:8px;
+  }
+  .item{
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.06));
+    border-radius:10px;padding:10px;border:1px solid rgba(255,255,255,0.03);
+    display:flex;flex-direction:column;gap:6px;align-items:flex-start;
+    transition: transform .22s ease, box-shadow .22s ease;
+  }
+  .item:hover{transform:translateY(-6px);box-shadow:0 12px 30px rgba(0,0,0,0.6)}
+  .item .meta{display:flex;justify-content:space-between;width:100%;align-items:center}
+  .code{font-weight:700;color:var(--accent)}
+  .iname{font-size:13px;color:var(--txt)}
+  .price{font-weight:700;color:#ffd97f}
+  .buy-btn{
+    margin-top:6px;background:linear-gradient(180deg,#00ff99,#7cffb2);border:none;padding:8px 10px;border-radius:8px;cursor:pointer;
+    color:#03322a;font-weight:800;letter-spacing:0.6px;box-shadow:0 8px 20px rgba(0,255,153,0.12)
+  }
+  .buy-btn:active{transform:translateY(2px)}
+
+  /* Right — experience area */
+  .experience{
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.04));
+    border-radius:18px;padding:18px;border:1px solid rgba(255,255,255,0.03);
+    display:flex;flex-direction:column;gap:12px;height:760px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    position:relative;overflow:hidden;
+  }
+  .stage-top{display:flex;justify-content:space-between;align-items:center}
+  .big-display{
+    flex:1;border-radius:12px;background:linear-gradient(180deg,#00000022,#00182022);display:flex;align-items:center;justify-content:center;
+    position:relative;overflow:hidden;padding:8px;
+  }
+
+  /* Dino + product bay */
+  .dino-wrap{position:absolute;left:40px;top:60px;width:260px;height:260px;pointer-events:none}
+  svg.dino{
+    width:220px;height:220px; transform:translateX(-420px) scale(1); transition: transform .8s cubic-bezier(.2,.9,.2,1);
+    filter:drop-shadow(0 16px 36px rgba(0,0,0,0.6));
+  }
+  .dino.show{transform:translateX(0) scale(1)}
+  .bay{
+    position:absolute;right:40px;bottom:40px;width:300px;height:160px;border-radius:12px;background:linear-gradient(180deg,#00181a,#002726);
+    border:1px solid rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:center;color:var(--muted);
+    box-shadow: inset 0 6px 30px rgba(0,255,153,0.03);
+  }
+  .bay .slot{width:220px;height:120px;border-radius:8px;background:linear-gradient(180deg,#082b2a,#042827);display:flex;align-items:center;justify-content:center;color:#aef7d9; font-family: 'Orbitron'}
+  .bay .slot .text{font-size:12px}
+
+  /* receipt + history */
+  .side-panel{display:flex;flex-direction:column;gap:10px;width:340px}
+  .receipt{background:var(--panel);padding:10px;border-radius:10px;color:var(--muted);font-size:13px;height:140px;overflow:auto;}
+  .history{background:var(--panel);padding:10px;border-radius:10px;color:var(--muted);font-size:13px;height:220px;overflow:auto;}
+  .actions{display:flex;gap:8px;align-items:center}
+  .btn{background:linear-gradient(180deg,#0b6b58,#003e2f);border-radius:8px;padding:8px 10px;color:var(--txt);border:1px solid rgba(255,255,255,0.03);cursor:pointer}
+  .btn.secondary{background:transparent;border:1px dashed rgba(255,255,255,0.04);color:var(--muted)}
+  .toggle{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px}
+
+  /* canvas covers */
+  canvas#effects{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
+
+  /* footer small */
+  .hint{font-size:12px;color:var(--muted);margin-top:4px}
+
+  /* responsiveness */
+  @media (max-width:980px){
+    .stage{grid-template-columns:1fr;grid-auto-rows:auto;height:auto}
+    .cabinet{height:auto}
+    .experience{height:620px}
+    .dino-wrap{left:20px;top:24px;width:180px;height:180px}
+  }
+</style>
+</head>
+<body>
+  <div class="stage" role="application" aria-label="Ultimate Dino Vending Machine">
+    <div class="cabinet" aria-hidden="false">
+      <div class="header">
+        <div class="brand">
+          <div class="logo" aria-hidden="true">🦖</div>
+          <div>
+            <div class="title">DINO VENDING — PRO MAX</div>
+            <div class="subtitle">Arcade Neon • Responsive • Accessible</div>
+          </div>
+        </div>
+        <div>
+          <div class="led-panel" aria-live="polite" aria-atomic="true">
+            <div class="label">BALANCE</div>
+            <div id="balanceValue" class="value">₩0 NTD</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen" role="region" aria-label="Vending screen">
+        <div class="top-row">
+          <div style="display:flex;gap:8px;align-items:center">
+            <div style="font-size:13px;color:var(--muted)">Products</div>
+            <div class="hint">Press keys 1-5 to BUY quickly</div>
+          </div>
+          <div class="hint">Keyboard / Touch / Mouse supported</div>
+        </div>
+
+        <div class="controls">
+          <div class="items" id="itemsList" role="list">
+            <!-- Items inserted by JS -->
+          </div>
+
+          <div style="display:flex;gap:10px;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-size:12px;color:var(--muted)">Insert money</div>
+              <div style="margin-top:8px;display:flex;gap:8px;" id="insertButtons">
+                <button class="btn" data-value="1">🪙 1</button>
+                <button class="btn" data-value="5">🪙 5</button>
+                <button class="btn" data-value="10">🪙 10</button>
+                <button class="btn" data-value="50">💵 50</button>
+                <button class="btn" data-value="100">💵 100</button>
+              </div>
+              <div class="hint" style="margin-top:8px">Tip: long-press on mobile for rapid insert</div>
+            </div>
+
+            <div style="width:200px">
+              <div style="font-size:12px;color:var(--muted)">Actions</div>
+              <div style="display:flex;gap:8px;margin-top:8px">
+                <button id="returnChange" class="btn secondary">Return Change</button>
+                <button id="clearHistory" class="btn secondary">Clear</button>
+              </div>
+              <div class="hint" style="margin-top:8px">Saved to localStorage</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right area -->
+    <div class="experience" aria-hidden="false">
+      <div class="stage-top">
+        <div style="display:flex;flex-direction:column">
+          <div style="font-size:16px;font-weight:800;color:var(--neon);letter-spacing:1px">PRO MAX EXPERIENCE</div>
+          <div style="font-size:12px;color:var(--muted)">Immersive coin physics, dino show, confetti, audio</div>
+        </div>
+
+        <div class="actions">
+          <div class="toggle"><label for="soundToggle">🔊</label><input id="soundToggle" type="checkbox" checked style="transform:scale(1.1)"></div>
+        </div>
+      </div>
+
+      <div class="big-display" id="bigDisplay">
+        <div class="dino-wrap" aria-hidden="true">
+          <!-- Cute SVG dino, animated via CSS class toggle -->
+          <svg class="dino" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Dino">
+            <defs>
+              <linearGradient id="g1" x1="0" x2="1"><stop offset="0" stop-color="#00ff99"/><stop offset="1" stop-color="#00e6b8"/></linearGradient>
+              <filter id="glow"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            </defs>
+            <g filter="url(#glow)" transform="translate(0,10) scale(0.9)">
+              <path fill="url(#g1)" d="M110 300c-10-50 10-110 80-140 0 0 10-40 70-50 50-8 90 4 140 40 18 12 34 32 46 52 8 14 6 32-6 44-12 12-30 14-44 6-8-4-16-10-22-16-24 8-52 18-84 22-26 3-48 2-70 12-28 13-46 38-68 66-16 20-46 18-64 2-18-16-20-46-4-66z"/>
+              <ellipse cx="270" cy="220" rx="20" ry="24" fill="#042"/>
+              <circle cx="175" cy="180" r="14" fill="#013a27"/>
+            </g>
+          </svg>
+        </div>
+
+        <div class="bay" aria-hidden="true">
+          <div class="slot" id="productSlot">
+            <div class="text">No product dispensed</div>
+          </div>
+        </div>
+
+        <canvas id="effects"></canvas>
+      </div>
+
+      <div style="display:flex;gap:12px;margin-top:6px">
+        <div class="side-panel" style="flex:1">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="font-size:13px;font-weight:700">Receipt</div>
+            <div style="font-size:12px;color:var(--muted)" id="lastTime">—</div>
+          </div>
+          <div class="receipt" id="receiptArea" aria-live="polite">No transactions yet.</div>
+        </div>
+
+        <div class="side-panel" style="width:340px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="font-size:13px;font-weight:700">History</div>
+            <div style="font-size:12px;color:var(--muted)">Auto-saved</div>
+          </div>
+          <div class="history" id="historyArea" aria-live="polite">—</div>
+          <div style="display:flex;gap:8px;margin-top:10px;justify-content:flex-end">
+            <button id="exportBtn" class="btn">Export</button>
+            <button id="importBtn" class="btn secondary">Import</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* --------------------
+   App data and helpers
+   -------------------- */
+const PRODUCTS = [
+  {code:'1', id:'D1', name:'Crunchy Chips', price:30},
+  {code:'2', id:'D2', name:'Dino Soda', price:45},
+  {code:'3', id:'D3', name:'Water', price:25},
+  {code:'4', id:'D4', name:'Dino Gummies', price:50},
+  {code:'5', id:'D5', name:'Fossil Cookies', price:40}
+];
+
+const DENOMS = [100,50,10,5,1];
+
+const $ = sel => document.querySelector(sel);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+/* Persistent store */
+const STORE_KEY = 'dino_vend_pro_max_store_v1';
+function readStore(){
+  try{ return JSON.parse(localStorage.getItem(STORE_KEY)) || {balance:0,history:[]} }catch(e){return {balance:0,history:[]}}
+}
+function writeStore(obj){ localStorage.setItem(STORE_KEY, JSON.stringify(obj)) }
+
+/* --------------------
+   UI init
+   -------------------- */
+const store = readStore();
+let balance = store.balance || 0;
+const history = store.history || [];
+
+const balanceEl = $('#balanceValue');
+const itemsList = $('#itemsList');
+const insertButtons = $('#insertButtons');
+const receiptArea = $('#receiptArea');
+const historyArea = $('#historyArea');
+const productSlot = $('#productSlot .text');
+const effectsCanvas = $('#effects');
+const dinoSvg = document.querySelector('svg.dino');
+const soundToggle = $('#soundToggle');
+
+function formatNTD(n){ return `${n} NTD`}
+
+/* render products */
+function renderProducts(){
+  itemsList.innerHTML='';
+  PRODUCTS.forEach(p=>{
+    const div = document.createElement('div');
+    div.className='item';
+    div.setAttribute('role','listitem');
+    div.innerHTML = `
+      <div class="meta"><div><div class="code">${p.id}</div><div class="iname">${p.name}</div></div><div class="price">${p.price}</div></div>
+      <button class="buy-btn" data-code="${p.code}" data-price="${p.price}">BUY</button>
+    `;
+    itemsList.appendChild(div);
+  });
+}
+renderProducts();
+
+/* update displays */
+function updateBalanceUI(){
+  balanceEl.textContent = `₩ ${balance} NTD`;
+  balanceEl.setAttribute('aria-live','polite');
+}
+
+/* history / receipt render */
+function pushHistory(entry){
+  history.unshift(entry);
+  if(history.length>50) history.pop();
+  writeStore({balance:0,history});
+  renderHistory();
+  renderReceipt(entry);
+}
+function renderHistory(){
+  if(history.length===0){ historyArea.textContent='—'; return }
+  historyArea.innerHTML = history.map(h => `<div style="padding:6px;border-bottom:1px dashed rgba(255,255,255,0.03)"><strong>${h.product}</strong> • ${h.price} NTD • <span style="color:var(--muted)">${h.time}</span></div>`).join('');
+}
+function renderReceipt(entry){
+  if(!entry) { receiptArea.textContent = 'No transactions yet.'; return }
+  receiptArea.innerHTML = `
+    <div style="font-weight:800;color:var(--accent);margin-bottom:8px">Receipt</div>
+    <div><strong>Product:</strong> ${entry.product}</div>
+    <div><strong>Price:</strong> ${entry.price} NTD</div>
+    <div><strong>Paid:</strong> ${entry.paid} NTD</div>
+    <div><strong>Change:</strong> ${entry.change} NTD</div>
+    <div style="margin-top:8px;color:var(--muted)">${entry.time}</div>
+  `;
+}
+
+/* load initial store */
+function loadInitial(){
+  balance = store.balance || 0;
+  updateBalanceUI();
+  renderHistory();
+  if(history[0]) renderReceipt(history[0]);
+}
+loadInitial();
+
+/* --------------------
+   Audio (WebAudio) - synthesized effects
+   -------------------- */
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let ctx = null;
+function ensureCtx(){ if(!ctx) ctx = new AudioCtx() }
+function playBeep(freq=880,dur=0.08, type='sine', gain=0.08){
+  if(!soundToggle.checked) return;
+  ensureCtx();
+  const o = ctx.createOscillator();
+  const g = ctx.createGain();
+  o.type = type; o.frequency.value = freq; g.gain.value = gain;
+  o.connect(g); g.connect(ctx.destination);
+  o.start();
+  g.gain.setValueAtTime(gain, ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + dur);
+  o.stop(ctx.currentTime + dur + 0.02);
+}
+function playCoin(){
+  playBeep(1200,0.06,'square',0.06);
+  playBeep(1800,0.06,'sine',0.045);
+}
+function playRoar(){
+  if(!soundToggle.checked) return;
+  ensureCtx();
+  // quick synthesized "roar" using noise + low oscillator
+  const duration = 0.9;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type='sawtooth'; osc.frequency.setValueAtTime(80, ctx.currentTime);
+  gain.gain.setValueAtTime(0.001, ctx.currentTime);
+  gain.gain.linearRampToValueAtTime(0.18, ctx.currentTime + 0.08);
+  gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+  osc.connect(gain); gain.connect(ctx.destination);
+  osc.start(); osc.stop(ctx.currentTime + duration+0.02);
+  // add short higher pitch bursts
+  setTimeout(()=>playBeep(700,0.12,'sawtooth',0.08),60);
+  setTimeout(()=>playBeep(560,0.14,'triangle',0.08),180);
+}
+
+/* --------------------
+   Effects (Canvas): coins & confetti physics
+   -------------------- */
+const canvas = effectsCanvas;
+const ctx2 = canvas.getContext('2d');
+let particles = [];
+function resizeCanvas(){ canvas.width = canvas.clientWidth * devicePixelRatio; canvas.height = canvas.clientHeight * devicePixelRatio; ctx2.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0) }
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+function spawnCoinsFrom(x,y,amount=6){
+  for(let i=0;i<amount;i++){
+    particles.push({
+      type:'coin',
+      x: x + (Math.random()*80-40), y: y + (Math.random()*20-10),
+      vx: (Math.random()*6-3), vy: (Math.random()*-6)-2,
+      size: 10 + Math.random()*8,
+      rot: Math.random()*Math.PI*2,
+      drot: (Math.random()*0.2-0.1),
+      life: 150 + Math.random()*80
+    });
+  }
+  if(soundToggle.checked) playCoin();
+}
+
+function spawnConfetti(){
+  for(let i=0;i<32;i++){
+    particles.push({
+      type:'confetti',
+      x: Math.random()*canvas.clientWidth,
+      y: -10,
+      vx: (Math.random()*8-4),
+      vy: 1 + Math.random()*2,
+      size: 6+Math.random()*10,
+      hue: Math.floor(Math.random()*360),
+      rot: Math.random()*Math.PI*2,
+      drot: (Math.random()*0.4-0.2),
+      life: 120 + Math.random()*60
+    });
+  }
+  if(soundToggle.checked) playBeep(1200,0.06,'triangle',0.06);
+}
+
+function animate(){
+  ctx2.clearRect(0,0,canvas.width,canvas.height);
+  for(let i=particles.length-1;i>=0;i--){
+    const p = particles[i];
+    // physics
+    p.x += p.vx; p.y += p.vy; p.vy += 0.25; p.rot += p.drot; p.life--;
+    if(p.type==='coin'){
+      // draw coin (circle + shine)
+      ctx2.save();
+      ctx2.translate(p.x,p.y);
+      ctx2.rotate(p.rot);
+      ctx2.beginPath();
+      ctx2.fillStyle = '#ffd25a';
+      ctx2.arc(0,0,p.size,0,Math.PI*2);
+      ctx2.fill();
+      ctx2.fillStyle = 'rgba(255,255,255,0.6)';
+      ctx2.fillRect(-p.size*0.6,-p.size*0.4,p.size*0.6,p.size*0.4);
+      ctx2.restore();
+    } else {
+      // confetti
+      ctx2.save();
+      ctx2.translate(p.x,p.y);
+      ctx2.rotate(p.rot);
+      ctx2.fillStyle = `hsl(${p.hue},85%,60%)`;
+      ctx2.fillRect(-p.size/2,-p.size/2,p.size,p.size*0.6);
+      ctx2.restore();
+    }
+    if(p.life < 0 || p.y > canvas.clientHeight + 40) particles.splice(i,1);
+  }
+  requestAnimationFrame(animate);
+}
+requestAnimationFrame(animate);
+
+/* --------------------
+   Purchase & change logic
+   -------------------- */
+function calcChange(amount){
+  const res = {};
+  let rem = amount;
+  for(let d of DENOMS){
+    const c = Math.floor(rem / d);
+    if(c>0){ res[d]=c; rem -= c*d; }
+  }
+  return res;
+}
+
+function animateDispense(product){
+  // show dino sliding in and product in bay
+  dinoSvg.classList.add('show');
+  productSlot.textContent = `${product.id} • ${product.name}`;
+  // spawn confetti
+  spawnConfetti();
+  // spawn coins equal to change center
+  setTimeout(()=>dinoSvg.classList.remove('show'), 1500);
+}
+
+/* handle buy */
+function handleBuy(code){
+  const p = PRODUCTS.find(x=>x.code===code);
+  if(!p) return;
+  if(balance >= p.price){
+    const paid = balance;
+    const change = balance - p.price;
+    balance = 0;
+    updateBalanceUI();
+    // compute change coins and spawn coin animation from right side
+    const c = calcChange(change);
+    // spawn coins from bay area
+    const bd = $('#bigDisplay').getBoundingClientRect();
+    spawnCoinsFrom(bd.left + bd.width*0.75, bd.top + bd.height*0.85, Math.max(8, Math.min(40, Math.floor(change/2)+6)));
+    animateDispense(p);
+    // audio
+    playRoar();
+    // push receipt + history
+    const time = (new Date()).toLocaleString();
+    const entry = {product: p.name, price: p.price, paid, change, time};
+    pushHistory(entry);
+    // store balance 0
+    writeStore({balance:0,history});
+    // ui updates
+    $('#lastTime').textContent = time;
+    $('#productSlot .text').style.color = '#aef7d9';
+    // update receipt visible
+    renderReceipt(entry);
+  } else {
+    const need = p.price - balance;
+    flashMessage(`Need ${need} NTD more`, true);
+    playBeep(440,0.12,'sine',0.06);
+  }
+}
+
+/* flash a short message on productSlot */
+let flashTimer = null;
+function flashMessage(msg, transient=false){
+  const el = $('#productSlot .text');
+  const prev = el.textContent;
+  el.textContent = msg;
+  el.style.color = transient ? '#ffccaa' : '#aef7d9';
+  if(flashTimer) clearTimeout(flashTimer);
+  if(transient) flashTimer = setTimeout(()=>{ el.textContent = prev; el.style.color = '#aef7d9' },1500);
+}
+
+/* --------------------
+   Event bindings
+   -------------------- */
+updateBalanceUI();
+
+/* insert money buttons */
+insertButtons.querySelectorAll('button').forEach(btn=>{
+  let holdInterval = null;
+  btn.addEventListener('pointerdown', (e)=>{
+    const v = Number(btn.dataset.value);
+    balance += v; updateBalanceUI();
+    spawnCoinsFrom(e.clientX - canvas.getBoundingClientRect().left, e.clientY - canvas.getBoundingClientRect().top, 6);
+    writeStore({balance,history});
+    // play sound
+    playCoin();
+    // for long press, repeatedly add
+    holdInterval = setInterval(()=>{ balance += v; updateBalanceUI(); writeStore({balance,history}); spawnCoinsFrom(Math.random()*canvas.clientWidth, -10, 3); playCoin(); }, 180);
+  });
+  window.addEventListener('pointerup', ()=>{ if(holdInterval) { clearInterval(holdInterval); holdInterval=null }});
+});
+
+/* buy buttons */
+itemsList.addEventListener('click', (ev)=>{
+  const btn = ev.target.closest('.buy-btn');
+  if(!btn) return;
+  const code = btn.dataset.code;
+  handleBuy(code);
+});
+
+/* keyboard quick buy 1-5 */
+window.addEventListener('keydown', (e)=>{
+  if(document.activeElement && (document.activeElement.tagName==='INPUT' || document.activeElement.tagName==='TEXTAREA')) return;
+  if(e.key >= '1' && e.key <= '5'){ handleBuy(e.key); }
+  if(e.key === 'r' || e.key === 'R'){ // return change
+    document.getElementById('returnChange').click();
+  }
+});
+
+/* return change button */
+$('#returnChange').addEventListener('click', ()=>{
+  if(balance <= 0){ flashMessage('No balance to return', true); return; }
+  const c = calcChange(balance);
+  const bd = $('#bigDisplay').getBoundingClientRect();
+  spawnCoinsFrom(bd.left + bd.width*0.6, bd.top + bd.height*0.1, Math.max(6, Math.min(40, Math.floor(balance/2)+4)));
+  playBeep(1000,0.08,'triangle',0.07);
+  const returned = balance;
+  balance = 0;
+  updateBalanceUI();
+  writeStore({balance,history});
+  flashMessage(`Returned ${returned} NTD`, true);
+});
+
+/* clear history */
+$('#clearHistory').addEventListener('click', ()=>{
+  if(!confirm('Clear all history and receipts?')) return;
+  history.length = 0;
+  writeStore({balance,history});
+  renderHistory(); receiptArea.textContent='No transactions yet.';
+});
+
+/* export / import */
+$('#exportBtn').addEventListener('click', ()=>{
+  const data = JSON.stringify({balance,history}, null, 2);
+  const blob = new Blob([data], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'dino_vending_export.json';
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+});
+$('#importBtn').addEventListener('click', ()=>{
+  const inj = prompt('Paste JSON data to import (overwrites history/balance):');
+  if(!inj) return;
+  try{
+    const parsed = JSON.parse(inj);
+    if(typeof parsed.balance === 'number' && Array.isArray(parsed.history)){
+      balance = parsed.balance; history.length=0; parsed.history.forEach(h=>history.push(h));
+      writeStore({balance,history});
+      updateBalanceUI(); renderHistory(); renderReceipt(history[0]);
+      alert('Import successful.');
+    } else throw new Error('Invalid format');
+  } catch(e){ alert('Import failed: ' + e.message) }
+});
+
+/* sound toggle resume audio context on user gesture */
+soundToggle.addEventListener('change', ()=>{
+  if(soundToggle.checked && ctx && ctx.state === 'suspended'){ ctx.resume(); }
+});
+
+/* load local store on first run */
+if(store && store.balance) { balance = store.balance; updateBalanceUI(); }
+
+/* small helpers */
+function humanTime(){ return new Date().toLocaleString() }
+
+/* init last time */
+$('#lastTime').textContent = history[0] ? history[0].time : '—';
+
+/* initial focus */
+document.addEventListener('DOMContentLoaded', ()=>{
+  // attach keyboard hints to buy buttons (1..5)
+  $$('.buy-btn').forEach((b,i)=>{
+    b.title = `Press ${i+1} to buy`; b.dataset.key = String(i+1);
+  });
+});
+
+/* kick off initial particle tick to ensure canvas sized */
+setTimeout(()=>{ resizeCanvas(); },250);
+
+/* Purple: animate a slow glowing effect across the cabinet using CSS already; nothing else needed */
+
+</script>
+</body>
+</html>
